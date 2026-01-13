@@ -272,6 +272,8 @@ const Pipeline: React.FC = () => {
     comment: string | null
     isStarted: boolean
     startDate: Dayjs | null
+    isCompleted?: boolean
+    endDate?: Dayjs | null
   } | null>(null)
   const stageSegmentRefs = useRef<{ [key: string]: HTMLDivElement | null }>({})
   const closingTimeoutRef = useRef<number | null>(null)
@@ -382,6 +384,9 @@ const Pipeline: React.FC = () => {
     field: 'startDate' | 'endDate',
     date: Dayjs | null
   ) => {
+    if (editingMilestone && editingMilestone.id === milestoneId) {
+      setEditingMilestone({ ...editingMilestone, [field]: date })
+    }
     setStages((prev) =>
       prev.map((stage) =>
         stage.id === stageId
@@ -396,26 +401,28 @@ const Pipeline: React.FC = () => {
     )
   }
 
-  const handleMilestoneComplete = (stageId: string, milestoneId: string) => {
-    setStages((prev) =>
-      prev.map((stage) =>
-        stage.id === stageId
-          ? {
-              ...stage,
-              milestones: stage.milestones.map((m) =>
-                m.id === milestoneId
-                  ? { 
-                      ...m, 
-                      isCompleted: !m.isCompleted, 
-                      endDate: !m.isCompleted ? dayjs() : null,
-                      isStarted: !m.isCompleted ? true : m.isStarted
-                    }
-                  : m
-              ),
-            }
-          : stage
-      )
-    )
+  const handleMilestoneComplete = (_stageId: string, milestoneId: string) => {
+    const target =
+      editingMilestone && editingMilestone.id === milestoneId
+        ? editingMilestone
+        : stages
+            .flatMap((s) => s.milestones)
+            .find((m) => m.id === milestoneId)
+
+    if (!target) return
+
+    const willComplete = !target.isCompleted
+    const updated: typeof target = {
+      ...target,
+      isCompleted: willComplete,
+      endDate: willComplete ? dayjs() : null,
+      isStarted: willComplete ? true : target.isStarted,
+      startDate: willComplete
+        ? target.startDate ?? dayjs()
+        : target.startDate,
+    }
+
+    setEditingMilestone(updated)
   }
 
 
@@ -432,6 +439,8 @@ const Pipeline: React.FC = () => {
         comment: milestone.comment,
         isStarted: milestone.isStarted,
         startDate: milestone.startDate,
+        isCompleted: milestone.isCompleted,
+        endDate: milestone.endDate,
       })
     }
   }
@@ -464,6 +473,8 @@ const Pipeline: React.FC = () => {
                       comment: editingMilestone.comment,
                       isStarted: editingMilestone.isStarted,
                       startDate: editingMilestone.startDate,
+                      isCompleted: editingMilestone.isCompleted ?? m.isCompleted,
+                      endDate: editingMilestone.endDate ?? m.endDate,
                     }
                   : m
               ),
@@ -478,20 +489,24 @@ const Pipeline: React.FC = () => {
 
   const handleMarkAsStarted = () => {
     if (!editingMilestone) return
-    setEditingMilestone({
+    const updated = {
       ...editingMilestone,
       isStarted: true,
-      startDate: dayjs(), // Всегда устанавливаем текущую дату
-    })
+      startDate: dayjs(), // Всегда текущая дата
+    }
+    setEditingMilestone(updated)
   }
 
   const handleUnmarkAsStarted = () => {
     if (!editingMilestone) return
-    setEditingMilestone({
+    const updated = {
       ...editingMilestone,
       isStarted: false,
       startDate: null,
-    })
+      isCompleted: false,
+      endDate: null,
+    }
+    setEditingMilestone(updated)
   }
 
   const calculateStageCompletion = (stage: Stage): number => {
@@ -504,6 +519,19 @@ const Pipeline: React.FC = () => {
     const percentage = Math.round((completedCount / totalCount) * 100)
     
     return percentage
+  }
+
+  const getStageSpecialColor = (stage: Stage): '' | 'red' | 'green' => {
+    if (stage.id !== '1') return ''
+    const realized = stage.milestones.find(
+      (m) => m.id === 'new-idea-6' || m.name === 'Идея реализована'
+    )
+    const rejected = stage.milestones.find(
+      (m) => m.id === 'new-idea-7' || m.name === 'Отклонена и закрыта'
+    )
+    if (rejected?.isCompleted) return 'red'
+    if (realized?.isCompleted) return 'green'
+    return ''
   }
 
   const calculateCompletionSpeed = (milestone: Milestone): number | null => {
@@ -682,6 +710,9 @@ const Pipeline: React.FC = () => {
     const displayDeadline = editing?.deadline ?? milestone.deadline
     const displayComment = editing?.comment ?? milestone.comment
     const displayIsStarted = editing?.isStarted ?? milestone.isStarted
+    const displayIsCompleted = editing?.isCompleted ?? milestone.isCompleted
+    const displayStartDate = editing?.startDate ?? milestone.startDate
+    const displayEndDate = editing?.endDate ?? milestone.endDate
     
     return (
       <div style={{ minWidth: '250px' }}>
@@ -750,7 +781,7 @@ const Pipeline: React.FC = () => {
             <DatePicker
               id={`milestone-start-date-${milestone.id}`}
               name={`milestone-start-date-${milestone.id}`}
-              value={milestone.startDate}
+              value={displayStartDate}
               onChange={(date) => {
                 const stageId = stages.find((s) =>
                   s.milestones.some((m) => m.id === milestone.id)
@@ -763,14 +794,14 @@ const Pipeline: React.FC = () => {
               format="DD.MM.YYYY"
             />
           </div>
-          {milestone.isCompleted && milestone.endDate && (
+          {displayIsCompleted && displayEndDate && (
             <div>
               <Text strong>{t('milestone.endDate')}:</Text>
               <br />
               <DatePicker
                 id={`milestone-end-date-${milestone.id}`}
                 name={`milestone-end-date-${milestone.id}`}
-                value={milestone.endDate}
+                value={displayEndDate}
                 onChange={(date) => {
                   const stageId = stages.find((s) =>
                     s.milestones.some((m) => m.id === milestone.id)
@@ -786,30 +817,26 @@ const Pipeline: React.FC = () => {
           )}
               <Divider style={{ margin: '8px 0' }} />
           <Space direction="vertical" size="small" style={{ width: '100%' }}>
-            {!milestone.isCompleted && (
-              <>
-                {!displayIsStarted ? (
-                  <Button
-                    size="small"
-                    icon={<ClockCircleOutlined />}
-                    onClick={handleMarkAsStarted}
-                    style={{ width: '100%' }}
-                  >
-                    {t('milestone.markAsStarted')}
-                  </Button>
-                ) : (
-                  <Button
-                    size="small"
-                    icon={<ClockCircleOutlined />}
-                    onClick={handleUnmarkAsStarted}
-                    style={{ width: '100%' }}
-                  >
-                    {t('milestone.unmarkAsStarted')}
-                  </Button>
-                )}
-              </>
-            )}
-            {!milestone.isCompleted && (
+            {!displayIsStarted && !displayIsCompleted ? (
+              <Button
+                size="small"
+                icon={<ClockCircleOutlined />}
+                onClick={handleMarkAsStarted}
+                style={{ width: '100%' }}
+              >
+                {t('milestone.markAsStarted')}
+              </Button>
+            ) : (displayIsStarted || displayIsCompleted) ? (
+              <Button
+                size="small"
+                icon={<ClockCircleOutlined />}
+                onClick={handleUnmarkAsStarted}
+                style={{ width: '100%' }}
+              >
+                {t('milestone.unmarkAsStarted')}
+              </Button>
+            ) : null}
+            {!displayIsCompleted && (
               <Button
                 type="primary"
                 size="small"
@@ -827,7 +854,7 @@ const Pipeline: React.FC = () => {
                 {t('milestone.markCompleted')}
               </Button>
           )}
-          {milestone.isCompleted && (
+            {displayIsCompleted && (
               <Button
                 size="small"
                 onClick={() => {
@@ -1098,7 +1125,7 @@ const Pipeline: React.FC = () => {
                       : undefined
                   }
                 >
-                  <div className={`stage-number ${completion === -1 ? 'empty' : ''}`}>
+              <div className={`stage-number ${completion === -1 ? 'empty' : ''} ${getStageSpecialColor(stage)}`}>
                     {completion === -1 ? '' : `${completion}%`}
               </div>
                   <div 

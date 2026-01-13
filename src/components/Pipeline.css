@@ -78,6 +78,14 @@
   color: transparent;
 }
 
+.stage-number.red {
+  background: #ff4d4f;
+}
+
+.stage-number.green {
+  background: #52c41a;
+}
+
 .stage-name {
   font-weight: 600;
   font-size: 14px;
