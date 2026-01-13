@@ -1,0 +1,410 @@
+.pipeline-container {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+  padding: 24px 0;
+  box-sizing: border-box;
+}
+
+.pipeline-wrapper {
+  position: relative;
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 100%;
+}
+
+/* Заголовок с названиями этапов */
+.pipeline-stages-header {
+  display: flex;
+  padding: 0 20px;
+  margin-bottom: 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.stage-header-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  position: relative;
+}
+
+.stage-expand-btn {
+  margin-top: 4px;
+  color: #1890ff;
+}
+
+.stage-expand-btn:hover {
+  color: #40a9ff;
+}
+
+.stage-expand-btn .anticon {
+  font-size: 20px !important;
+  width: 20px !important;
+  height: 20px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.stage-expand-btn .anticon svg {
+  width: 20px !important;
+  height: 20px !important;
+  font-size: 20px !important;
+}
+
+.stage-number {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #1890ff;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.stage-number.empty {
+  background: transparent;
+  border: 2px solid #d9d9d9;
+  color: transparent;
+}
+
+.stage-name {
+  font-weight: 600;
+  font-size: 14px;
+  text-align: center;
+  color: #262626;
+  max-width: 100%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  line-height: 1.2;
+}
+
+/* Линия пайплайна */
+.pipeline-line-wrapper {
+  position: relative;
+  padding: 20px 20px 20px 20px;
+  overflow: visible;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.pipeline-line {
+  display: flex;
+  position: relative;
+  min-height: 80px;
+  align-items: center;
+  padding: 0;
+  overflow: visible;
+  width: max-content;
+  min-width: 100%;
+}
+
+.pipeline-line::before {
+  display: none;
+}
+
+.pipeline-stage-segment {
+  position: relative;
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  overflow: visible;
+  flex: 1 1 auto;
+  min-width: 200px;
+  transition: min-width 0.3s ease;
+}
+
+.pipeline-stage-line-segments {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 3px;
+  display: flex;
+  align-items: center;
+  z-index: 0;
+  transform: translateY(-50%);
+  pointer-events: none;
+  gap: 0;
+}
+
+.pipeline-line-segment {
+  height: 3px;
+  flex: 1;
+  min-width: 0;
+}
+
+.pipeline-line-segment.blue {
+  background: #1890ff;
+}
+
+.pipeline-line-segment.green {
+  background: #52c41a;
+}
+
+.stage-divider {
+  width: 1px;
+  min-height: 50px;
+  background: #d9d9d9;
+  z-index: 2;
+  position: relative;
+  align-self: stretch;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.milestones-on-line {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 16px;
+  flex-wrap: nowrap;
+  min-height: 100%;
+  position: relative;
+  z-index: 5;
+  overflow: visible;
+  padding: 0 8px;
+}
+
+.milestone-wrapper {
+  display: block;
+  position: relative;
+  z-index: 6;
+  user-select: none;
+  cursor: move;
+  min-width: 120px;
+  flex-shrink: 0;
+  height: 80px;
+}
+
+.milestone-wrapper.dragging {
+  opacity: 0.5;
+  cursor: grabbing;
+}
+
+.milestone-wrapper.drag-over .milestone-icon-wrapper {
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+.milestone-icon-wrapper {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border: 2px solid #d9d9d9;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 10;
+  flex-shrink: 0;
+  margin: 0;
+  overflow: visible;
+  transform: translate(-50%, -50%);
+}
+
+.milestone-icon-wrapper.not-started {
+  background: #fff;
+  border: 2px solid #d9d9d9;
+}
+
+.milestone-icon-wrapper.in-progress {
+  background: #faad14;
+  border: 2px solid #faad14;
+}
+
+.milestone-icon-wrapper.completed-on-time {
+  background: #52c41a;
+  border: 2px solid #52c41a;
+}
+
+.milestone-icon-wrapper.completed-late {
+  background: #ff4d4f;
+  border: 2px solid #ff4d4f;
+}
+
+.milestone-icon-wrapper:hover {
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+.milestone-icon-wrapper.focused {
+  transform: translate(-50%, -50%) scale(1.1);
+  filter: drop-shadow(0 2px 8px rgba(24, 144, 255, 0.4));
+}
+
+.milestone-icon {
+  font-size: 20px;
+  color: #fff;
+  line-height: 1;
+}
+
+.milestone-icon-wrapper.not-started .milestone-icon {
+  color: #d9d9d9;
+}
+
+.milestone-icon-wrapper.in-progress .milestone-icon {
+  color: #fff;
+}
+
+.milestone-icon-wrapper.completed-on-time .milestone-icon {
+  color: #fff;
+}
+
+.milestone-icon-wrapper.completed-late .milestone-icon {
+  color: #fff;
+}
+
+.milestone-speed-indicator {
+  position: relative;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+.milestone-speed-indicator.late {
+  background: #ff4d4f;
+  color: #fff;
+}
+
+.milestone-speed-indicator.early {
+  background: #52c41a;
+  color: #fff;
+}
+
+.milestone-speed-indicator-wrapper {
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 11;
+}
+
+.milestone-warning-icon-above {
+  position: absolute;
+  left: calc(100% + 4px);
+  top: 50%;
+  transform: translateY(-50%);
+  color: #ff4d4f;
+  font-size: 14px;
+  z-index: 12;
+}
+
+.milestone-label {
+  position: absolute;
+  top: calc(50% + 24px);
+  left: 50%;
+  transform: translate(-50%, 0);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  pointer-events: none;
+  z-index: 7;
+}
+
+.milestone-name-wrapper {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 4px;
+  max-width: 120px;
+  width: 100%;
+  text-align: center;
+}
+
+.milestone-name {
+  line-height: 1.2;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+  flex: 1;
+  min-width: 0;
+  align-self: flex-start;
+  vertical-align: top;
+  text-align: center;
+  pointer-events: auto;
+}
+
+.milestone-name.single-line {
+  display: block !important;
+  -webkit-line-clamp: unset !important;
+  -webkit-box-orient: unset !important;
+  overflow: visible !important;
+  text-overflow: unset !important;
+  white-space: nowrap !important;
+  max-height: none !important;
+  height: auto !important;
+  min-height: 0 !important;
+  vertical-align: top !important;
+  line-height: 1.2 !important;
+  align-self: flex-start !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-align: center !important;
+}
+
+.milestone-warning-icon {
+  color: #ff4d4f;
+  font-size: 14px;
+  flex-shrink: 0;
+  margin-top: calc(16.5px * 1.2);
+  align-self: flex-start;
+  line-height: 1.2;
+}
+
+.stage-footer-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-width: 0;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+}
+
+.add-milestone-btn {
+  margin-top: 4px;
+}
+
+.milestone-name-tooltip {
+  margin-top: 1px !important;
+}
+
+.milestone-name-tooltip .ant-tooltip-arrow {
+  margin-top: 1px !important;
+}
+
+/* Футер с кнопками добавления */
+.pipeline-stages-footer {
+  display: flex;
+  padding: 0 20px;
+  margin-top: 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
