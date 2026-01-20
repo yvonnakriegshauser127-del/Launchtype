@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { Card, Button, Input, Popover, DatePicker, Space, Typography, Tooltip, Divider, Popconfirm } from 'antd'
-import { PlusCircleOutlined, CheckCircleOutlined, ClockCircleOutlined, DeleteOutlined, WarningOutlined, UpCircleOutlined, DownCircleOutlined } from '@ant-design/icons'
+import { Card, Button, Input, Popover, DatePicker, Space, Typography, Tooltip, Divider, Popconfirm, AutoComplete } from 'antd'
+import { PlusCircleOutlined, CheckCircleOutlined, ClockCircleOutlined, DeleteOutlined, WarningOutlined, UpCircleOutlined, DownCircleOutlined, UserOutlined, LaptopOutlined } from '@ant-design/icons'
 import dayjs, { Dayjs } from 'dayjs'
 import { useTranslation } from '../hooks/useTranslation'
 import type { Stage, Milestone } from '../types/pipeline'
@@ -10,250 +10,130 @@ const { Text } = Typography
 
 const Pipeline: React.FC = () => {
   const { t } = useTranslation()
+  
+  // Демонстрационные кастомные майлстоуны для автодополнения
+  const predefinedMilestones = [
+    'Проверка качества',
+    'Согласование с клиентом',
+    'Подготовка документации',
+    'Техническая проверка',
+    'Финансовая проверка',
+    'Юридическая проверка',
+    'Согласование бюджета',
+    'Подготовка к запуску',
+    'Тестирование функционала',
+    'Финальная проверка',
+  ]
+  
   const [stages, setStages] = useState<Stage[]>(() => {
+    const createMilestone = (
+      id: string,
+      name: string,
+      isNegative = false,
+      isPositive = false
+    ): Milestone => ({
+      id,
+      name,
+      startDate: null,
+      endDate: null,
+      deadline: null,
+      comment: null,
+      isCompleted: false,
+      isStarted: false,
+      isEditing: false,
+      isDefault: true,
+      isNegative,
+      isPositive,
+    })
+
     const initialStages: Stage[] = [
       { 
         id: '1', 
-        name: t('stages.newIdea'), 
+        name: 'Анализ идеи',
         milestones: [
-          {
-            id: 'new-idea-1',
-            name: 'Создание',
-            startDate: null,
-            endDate: null,
-            deadline: null,
-            comment: null,
-            isCompleted: false,
-            isStarted: false,
-            isEditing: false,
-          },
-          {
-            id: 'new-idea-2',
-            name: 'Проверка',
-            startDate: dayjs().subtract(5, 'day'),
-            endDate: null,
-            deadline: dayjs().add(5, 'day'),
-            comment: null,
-            isCompleted: false,
-            isStarted: true,
-            isEditing: false,
-          },
-          {
-            id: 'new-idea-3',
-            name: 'Поиск поставщика',
-            startDate: dayjs().subtract(10, 'day'),
-            endDate: dayjs().subtract(2, 'day'),
-            deadline: dayjs().subtract(1, 'day'),
-            comment: null,
-            isCompleted: true,
-            isStarted: true,
-            isEditing: false,
-          },
-          {
-            id: 'new-idea-4',
-            name: 'Создание карточки',
-            startDate: dayjs().subtract(8, 'day'),
-            endDate: dayjs().subtract(1, 'day'),
-            deadline: dayjs().subtract(3, 'day'),
-            comment: null,
-            isCompleted: true,
-            isStarted: true,
-            isEditing: false,
-          },
-          {
-            id: 'new-idea-5',
-            name: 'Добавление ASIN',
-            startDate: null,
-            endDate: null,
-            deadline: null,
-            comment: null,
-            isCompleted: false,
-            isStarted: false,
-            isEditing: false,
-          },
-          {
-            id: 'new-idea-6',
-            name: 'Идея реализована',
-            startDate: null,
-            endDate: null,
-            deadline: null,
-            comment: null,
-            isCompleted: false,
-            isStarted: false,
-            isEditing: false,
-          },
-          {
-            id: 'new-idea-7',
-            name: 'Отклонена и закрыта',
-            startDate: null,
-            endDate: null,
-            deadline: null,
-            comment: null,
-            isCompleted: false,
-            isStarted: false,
-            isEditing: false,
-          },
+          createMilestone('analysis-1', 'Новая идея'),
+          createMilestone('analysis-2', 'Просчет идеи'),
+          createMilestone('analysis-3', 'Проверка идеи', false, true),
+          createMilestone('analysis-4', 'Идея отклонена', true),
         ]
       },
       { 
         id: '2', 
-        name: t('stages.suppliers'), 
+        name: 'Поиск поставщика',
         milestones: [
-          {
-            id: 'suppliers-1',
-            name: 'Поиск поставщика',
-            startDate: null,
-            endDate: null,
-            deadline: null,
-            comment: null,
-            isCompleted: false,
-            isStarted: false,
-            isEditing: false,
-          },
-          {
-            id: 'suppliers-2',
-            name: 'У байера на поиске',
-            startDate: null,
-            endDate: null,
-            deadline: null,
-            comment: null,
-            isCompleted: false,
-            isStarted: false,
-            isEditing: false,
-          },
-          {
-            id: 'suppliers-3',
-            name: 'У байера в работе',
-            startDate: null,
-            endDate: null,
-            deadline: null,
-            comment: null,
-            isCompleted: false,
-            isStarted: false,
-            isEditing: false,
-          },
-          {
-            id: 'suppliers-4',
-            name: 'Байер нашел поставщика',
-            startDate: null,
-            endDate: null,
-            deadline: null,
-            comment: null,
-            isCompleted: false,
-            isStarted: false,
-            isEditing: false,
-          },
-          {
-            id: 'suppliers-5',
-            name: 'Поставщик не был найден',
-            startDate: null,
-            endDate: null,
-            deadline: null,
-            comment: null,
-            isCompleted: false,
-            isStarted: false,
-            isEditing: false,
-          },
-          {
-            id: 'suppliers-6',
-            name: 'Цена поставщика не подходит',
-            startDate: null,
-            endDate: null,
-            deadline: null,
-            comment: null,
-            isCompleted: false,
-            isStarted: false,
-            isEditing: false,
-          },
-          {
-            id: 'suppliers-7',
-            name: 'Поставщик не был найден (проверено)',
-            startDate: null,
-            endDate: null,
-            deadline: null,
-            comment: null,
-            isCompleted: false,
-            isStarted: false,
-            isEditing: false,
-          },
-          {
-            id: 'suppliers-8',
-            name: 'Цена поставщика не подходит (проверено)',
-            startDate: null,
-            endDate: null,
-            deadline: null,
-            comment: null,
-            isCompleted: false,
-            isStarted: false,
-            isEditing: false,
-          },
-          {
-            id: 'suppliers-9',
-            name: 'Поиск завершен',
-            startDate: null,
-            endDate: null,
-            deadline: null,
-            comment: null,
-            isCompleted: false,
-            isStarted: false,
-            isEditing: false,
-          },
+          createMilestone('suppliers-1', 'Передано на поиск'),
+          createMilestone('suppliers-2', 'Передано баеру'),
+          createMilestone('suppliers-3', 'У баера в работе'),
+          createMilestone('suppliers-4', 'Поставщик найден'),
+          createMilestone('suppliers-5', 'Поставщик не найден', true),
+          createMilestone('suppliers-6', 'Перепоиск поставщика'),
+          createMilestone('suppliers-7', 'Поиск завершен', false, true),
         ]
       },
-      { id: '3', name: t('stages.logistics'), milestones: [] },
+      { 
+        id: '3', 
+        name: 'Закупка товара',
+        milestones: [
+          createMilestone('purchase-1', 'Просчет закупки'),
+          createMilestone('purchase-2', 'Проверка закупки'),
+          createMilestone('purchase-3', 'Создание карточки на платформе'),
+          createMilestone('purchase-4', 'Добавление Асина и баркода'),
+          createMilestone('purchase-5', 'Заказ товара'),
+          createMilestone('purchase-6', 'Заказ в работе'),
+          createMilestone('purchase-7', 'Заказ оплачен'),
+          createMilestone('purchase-8', 'Заказ в пути на склад'),
+          createMilestone('purchase-9', 'Заказ отклонен', true),
+          createMilestone('purchase-10', 'Товар на складе', false, true),
+          createMilestone('purchase-11', 'Идея отклонена', true),
+        ]
+      },
       { 
         id: '4', 
-        name: t('stages.development'), 
+        name: 'Отправка товара',
         milestones: [
-          {
-            id: 'development-1',
-            name: 'CEO',
-            startDate: null,
-            endDate: null,
-            deadline: null,
-            comment: null,
-            isCompleted: false,
-            isStarted: false,
-            isEditing: false,
-          },
-          {
-            id: 'development-2',
-            name: 'PPC',
-            startDate: null,
-            endDate: null,
-            deadline: null,
-            comment: null,
-            isCompleted: false,
-            isStarted: false,
-            isEditing: false,
-          },
-          {
-            id: 'development-3',
-            name: 'Дизайн',
-            startDate: null,
-            endDate: null,
-            deadline: null,
-            comment: null,
-            isCompleted: false,
-            isStarted: false,
-            isEditing: false,
-          },
-          {
-            id: 'development-4',
-            name: 'Видео',
-            startDate: null,
-            endDate: null,
-            deadline: null,
-            comment: null,
-            isCompleted: false,
-            isStarted: false,
-            isEditing: false,
-          },
+          createMilestone('shipping-1', 'Проверка товара'),
+          createMilestone('shipping-2', 'Проблема с товаром', true),
+          createMilestone('shipping-3', 'Отправка товара', false, true),
         ]
       },
-      { id: '5', name: t('stages.preCheck'), milestones: [] },
-      { id: '6', name: t('stages.actions'), milestones: [] },
-      { id: '7', name: t('stages.report'), milestones: [] },
+      { 
+        id: '5', 
+        name: 'Разработка',
+        milestones: [
+          createMilestone('development-1', 'Создание Дизайна'),
+          createMilestone('development-2', 'Создание 3Д модели'),
+          createMilestone('development-3', 'Создание Видео'),
+          createMilestone('development-4', 'Создание SEO'),
+          createMilestone('development-5', 'Подготовка ППС', false, true),
+        ]
+      },
+      { 
+        id: '6', 
+        name: 'Продвижение товара',
+        milestones: [
+          createMilestone('promotion-1', 'Проверка готовности к запуску'),
+          createMilestone('promotion-2', 'Запуск товара'),
+          createMilestone('promotion-3', 'Запуск Вайна'),
+          createMilestone('promotion-4', 'Запуск рекламы'),
+          createMilestone('promotion-5', 'Запуск выкупов'),
+          createMilestone('promotion-6', 'Запуск компаний для блогеров', false, true),
+        ]
+      },
+      { 
+        id: '7', 
+        name: 'Отчет',
+        milestones: [
+          createMilestone('report-1', 'Успешный запуск', false, true),
+          createMilestone('report-2', 'Снятие с продажи', true),
+        ]
+      },
+      { 
+        id: '8', 
+        name: 'Отклоненные и закрытые',
+        milestones: [
+          createMilestone('rejected-1', 'Отклоненные и закрытые'),
+        ]
+      },
     ]
     return initialStages
   })
@@ -265,6 +145,7 @@ const Pipeline: React.FC = () => {
   const [newMilestoneId, setNewMilestoneId] = useState<string | null>(null)
   const [newMilestoneName, setNewMilestoneName] = useState<string>('')
   const [newMilestoneDeadline, setNewMilestoneDeadline] = useState<Dayjs | null>(null)
+  const [autoCompleteOpen, setAutoCompleteOpen] = useState<boolean>(false)
   const [editingMilestone, setEditingMilestone] = useState<{
     id: string
     name: string
@@ -274,6 +155,7 @@ const Pipeline: React.FC = () => {
     startDate: Dayjs | null
     isCompleted?: boolean
     endDate?: Dayjs | null
+    isDefault?: boolean
   } | null>(null)
   const stageSegmentRefs = useRef<{ [key: string]: HTMLDivElement | null }>({})
   const closingTimeoutRef = useRef<number | null>(null)
@@ -283,6 +165,8 @@ const Pipeline: React.FC = () => {
   const [expandedStages, setExpandedStages] = useState<Set<string>>(new Set())
   const stageNameRefs = useRef<{ [key: string]: HTMLDivElement | null }>({})
   const [collapsedStageWidth, setCollapsedStageWidth] = useState<number>(200)
+  const milestoneWrapperRefs = useRef<{ [key: string]: HTMLDivElement | null }>({})
+  const [milestonePositions, setMilestonePositions] = useState<{ [stageId: string]: { [milestoneId: string]: { left: number, right: number } } }>({})
 
   const toggleStageExpansion = (stageId: string) => {
     setExpandedStages((prev) => {
@@ -313,6 +197,9 @@ const Pipeline: React.FC = () => {
       isCompleted: false,
       isStarted: false,
       isEditing: false,
+      isDefault: false, // Кастомный майлстоун
+      isNegative: false,
+      isPositive: false,
     }
 
     setStages((prev) =>
@@ -441,6 +328,7 @@ const Pipeline: React.FC = () => {
         startDate: milestone.startDate,
         isCompleted: milestone.isCompleted,
         endDate: milestone.endDate,
+        isDefault: milestone.isDefault, // Сохраняем isDefault
       })
     }
   }
@@ -475,6 +363,7 @@ const Pipeline: React.FC = () => {
                       startDate: editingMilestone.startDate,
                       isCompleted: editingMilestone.isCompleted ?? m.isCompleted,
                       endDate: editingMilestone.endDate ?? m.endDate,
+                      isDefault: m.isDefault, // Сохраняем isDefault из оригинального майлстоуна
                     }
                   : m
               ),
@@ -514,23 +403,31 @@ const Pipeline: React.FC = () => {
       return -1 // -1 означает отсутствие майлстоунов
     }
     
-    const completedCount = stage.milestones.filter((m) => m.isCompleted).length
-    const totalCount = stage.milestones.length
+    // Исключаем все негативные майлстоуны из расчетов
+    const milestonesToCount = stage.milestones.filter(
+      (m) => !m.isNegative
+    )
+    
+    if (milestonesToCount.length === 0) {
+      return -1 // -1 означает отсутствие майлстоунов для подсчета
+    }
+    
+    const completedCount = milestonesToCount.filter((m) => m.isCompleted).length
+    const totalCount = milestonesToCount.length
     const percentage = Math.round((completedCount / totalCount) * 100)
     
     return percentage
   }
 
   const getStageSpecialColor = (stage: Stage): '' | 'red' | 'green' => {
-    if (stage.id !== '1') return ''
-    const realized = stage.milestones.find(
-      (m) => m.id === 'new-idea-6' || m.name === 'Идея реализована'
-    )
-    const rejected = stage.milestones.find(
-      (m) => m.id === 'new-idea-7' || m.name === 'Отклонена и закрыта'
-    )
-    if (rejected?.isCompleted) return 'red'
-    if (realized?.isCompleted) return 'green'
+    // Проверяем негативные майлстоуны (приоритет выше)
+    const negativeMilestone = stage.milestones.find(m => m.isNegative && m.isCompleted)
+    if (negativeMilestone) return 'red'
+    
+    // Проверяем позитивные майлстоуны
+    const positiveMilestone = stage.milestones.find(m => m.isPositive && m.isCompleted)
+    if (positiveMilestone) return 'green'
+    
     return ''
   }
 
@@ -592,7 +489,9 @@ const Pipeline: React.FC = () => {
   const handleDrop = (e: React.DragEvent, targetStageId: string, targetMilestoneId: string) => {
     e.preventDefault()
     e.stopPropagation()
-    if (!draggedMilestone) return
+    if (!draggedMilestone) {
+      return
+    }
 
     const { stageId: sourceStageId, milestoneId: sourceMilestoneId } = draggedMilestone
 
@@ -614,12 +513,96 @@ const Pipeline: React.FC = () => {
           return stage
         }
 
+        const sourceMilestone = milestones[sourceIndex]
+        const targetMilestone = milestones[targetIndex]
+        
+        // Проверяем, является ли перетаскиваемый майлстоун шаблонным
+        const isSourceDefault = sourceMilestone.isDefault !== false
+        const isTargetDefault = targetMilestone.isDefault !== false
+        
+        // Если перетаскиваемый майлстоун шаблонный, проверяем ограничения
+        if (isSourceDefault) {
+          // Шаблонные майлстоуны нельзя перемещать относительно друг друга
+          // Запрещаем перемещение шаблонного майлстоуна на место другого шаблонного майлстоуна
+          if (isTargetDefault) {
+            // Блокируем перемещение - нельзя менять расположение шаблонных майлстоунов относительно друг друга
+            setDraggedMilestone(null)
+            return stage
+          }
+          
+          // Если целевой майлстоун кастомный, проверяем, не разрываем ли мы последовательность шаблонных майлстоунов
+          // Получаем все шаблонные майлстоуны (кроме перетаскиваемого) в их текущем порядке
+            const defaultMilestones = milestones
+              .map((m, idx) => ({ milestone: m, originalIndex: idx }))
+              .filter(({ milestone }) => milestone.isDefault !== false && milestone.id !== sourceMilestoneId)
+            
+            // Находим позиции шаблонных майлстоунов слева и справа от целевой позиции
+            const leftDefaultMilestones = defaultMilestones.filter(({ originalIndex }) => originalIndex < targetIndex)
+            const rightDefaultMilestones = defaultMilestones.filter(({ originalIndex }) => originalIndex >= targetIndex)
+            
+            // Если целевая позиция находится между двумя шаблонными майлстоунами,
+            // которые расположены рядом друг с другом, блокируем перемещение
+            // (нельзя разрывать соседние шаблонные майлстоуны, перемещая шаблонный между ними)
+            if (leftDefaultMilestones.length > 0 && rightDefaultMilestones.length > 0) {
+              const leftMostDefaultIndex = leftDefaultMilestones[leftDefaultMilestones.length - 1].originalIndex
+              const rightMostDefaultIndex = rightDefaultMilestones[0].originalIndex
+              
+              // Если два шаблонных майлстоуна находятся рядом друг с другом (без кастомных между ними),
+              // и мы пытаемся вставить между ними шаблонный майлстоун, блокируем
+              if (rightMostDefaultIndex === leftMostDefaultIndex + 1) {
+                // Блокируем перемещение - нельзя разрывать соседние шаблонные майлстоуны
+                setDraggedMilestone(null)
+                return stage
+              }
+            }
+        }
+
         // Удаляем элемент из исходной позиции
         const [removed] = milestones.splice(sourceIndex, 1)
         
-        // Вычисляем новую позицию: вставляем перед целевым элементом
-        // Если исходный индекс был меньше целевого, после удаления целевой индекс уменьшился на 1
-        const newIndex = sourceIndex < targetIndex ? targetIndex - 1 : targetIndex
+        // Вычисляем новую позицию ПОСЛЕ удаления элемента
+        // После удаления все индексы справа от sourceIndex сдвинулись влево на 1
+        let newIndex: number
+        if (sourceIndex < targetIndex) {
+          // Перетаскиваем вправо: вставляем перед целевым элементом
+          // После удаления элемента с sourceIndex, целевой элемент сдвинулся влево на 1
+          // Если sourceIndex = targetIndex - 1 (соседние элементы), то newIndex = targetIndex - 1 = sourceIndex
+          // Это означает, что элемент останется на той же позиции!
+          // Правильная логика: если sourceIndex < targetIndex, мы хотим вставить элемент ПОСЛЕ целевого элемента
+          // После удаления целевой элемент находится на позиции targetIndex - 1
+          // Вставляем на позицию targetIndex (после целевого элемента)
+          newIndex = targetIndex
+        } else {
+          // Перетаскиваем влево: вставляем перед целевым элементом
+          // После удаления элемента с sourceIndex, целевой индекс не изменился
+          newIndex = targetIndex
+        }
+        
+        // Если перетаскиваемый майлстоун шаблонный, дополнительная проверка на сохранение порядка
+        // после удаления из исходной позиции
+        if (isSourceDefault) {
+          // Получаем все шаблонные майлстоуны после удаления
+          const defaultMilestonesAfterRemove = milestones
+            .map((m, idx) => ({ milestone: m, index: idx }))
+            .filter(({ milestone }) => milestone.isDefault !== false)
+          
+          // Находим шаблонные майлстоуны слева и справа от новой позиции
+          const leftDefault = defaultMilestonesAfterRemove
+            .filter(({ index }) => index < newIndex)
+            .sort((a, b) => b.index - a.index)[0] // Самый правый слева
+          
+          const rightDefault = defaultMilestonesAfterRemove
+            .filter(({ index }) => index >= newIndex)
+            .sort((a, b) => a.index - b.index)[0] // Самый левый справа
+          
+          // Если есть шаблонный майлстоун слева и справа, и они находятся рядом друг с другом,
+          // то нельзя вставлять шаблонный майлстоун между ними
+          if (leftDefault && rightDefault && rightDefault.index === leftDefault.index + 1) {
+            // Блокируем перемещение - нельзя разрывать соседние шаблонные майлстоуны
+            setDraggedMilestone(null)
+            return stage
+          }
+        }
         
         milestones.splice(newIndex, 0, removed)
 
@@ -642,17 +625,38 @@ const Pipeline: React.FC = () => {
     // Если это новый майлстоун, показываем форму создания
     if (newMilestoneId === milestone.id && milestone.name === '') {
     return (
-        <div style={{ minWidth: '250px' }}>
+        <div style={{ minWidth: '250px', position: 'relative' }}>
+          <UserOutlined
+            style={{
+              position: 'absolute',
+              top: 0,
+              right: 0,
+              fontSize: '16px',
+              color: '#1890ff'
+            }}
+          />
           <Space direction="vertical" size="middle" style={{ width: '100%' }}>
             <div>
               <Text strong>{t('milestone.namePlaceholder')}:</Text>
               <br />
-              <Input
+              <AutoComplete
                 value={newMilestoneName}
-                onChange={(e) => setNewMilestoneName(e.target.value)}
+                onChange={(value) => setNewMilestoneName(value)}
+                onSelect={(value) => {
+                  setNewMilestoneName(value)
+                  setAutoCompleteOpen(false)
+                }}
+                onFocus={() => setAutoCompleteOpen(true)}
+                onBlur={() => setAutoCompleteOpen(false)}
+                open={autoCompleteOpen}
+                options={predefinedMilestones.map(milestone => ({ value: milestone, label: milestone }))}
                 placeholder={t('milestone.namePlaceholder')}
                 style={{ width: '100%', marginTop: '4px' }}
                 autoFocus
+                allowClear
+                filterOption={(inputValue, option) =>
+                  option?.value?.toLowerCase().startsWith(inputValue.toLowerCase()) ?? false
+                }
               />
             </div>
             <div>
@@ -715,7 +719,28 @@ const Pipeline: React.FC = () => {
     const displayEndDate = editing?.endDate ?? milestone.endDate
     
     return (
-      <div style={{ minWidth: '250px' }}>
+      <div style={{ minWidth: '250px', position: 'relative' }}>
+        {milestone.isDefault === false ? (
+          <UserOutlined 
+            style={{ 
+              position: 'absolute', 
+              top: 0, 
+              right: 0, 
+              fontSize: '16px',
+              color: '#1890ff'
+            }} 
+          />
+        ) : (
+          <LaptopOutlined 
+            style={{ 
+              position: 'absolute', 
+              top: 0, 
+              right: 0, 
+              fontSize: '16px',
+              color: '#1890ff'
+            }} 
+          />
+        )}
         <Space direction="vertical" size="middle" style={{ width: '100%' }}>
           <div>
             <Text strong>{t('milestone.namePlaceholder')}:</Text>
@@ -732,6 +757,7 @@ const Pipeline: React.FC = () => {
               }}
               placeholder={t('milestone.namePlaceholder')}
               style={{ width: '100%', marginTop: '4px' }}
+              disabled={milestone.isDefault !== false}
             />
           </div>
           <div>
@@ -818,83 +844,151 @@ const Pipeline: React.FC = () => {
               <Divider style={{ margin: '8px 0' }} />
           <Space direction="vertical" size="small" style={{ width: '100%' }}>
             {!displayIsStarted && !displayIsCompleted ? (
-              <Button
-                size="small"
-                icon={<ClockCircleOutlined />}
-                onClick={handleMarkAsStarted}
-                style={{ width: '100%' }}
-              >
-                {t('milestone.markAsStarted')}
-              </Button>
+              milestone.isDefault === false ? (
+                <Tooltip title="Майлстоун является пользовательским. Отметки о начале и окончании выставляются вручную">
+                  <Button
+                    size="small"
+                    icon={<ClockCircleOutlined />}
+                    onClick={handleMarkAsStarted}
+                    style={{ width: '100%' }}
+                  >
+                    {t('milestone.markAsStarted')} <WarningOutlined style={{ marginLeft: '8px', fontSize: '14px', color: '#faad14' }} />
+                  </Button>
+                </Tooltip>
+              ) : (
+                <Button
+                  size="small"
+                  icon={<ClockCircleOutlined />}
+                  onClick={handleMarkAsStarted}
+                  style={{ width: '100%' }}
+                >
+                  {t('milestone.markAsStarted')}
+                </Button>
+              )
             ) : (displayIsStarted || displayIsCompleted) ? (
-              <Button
-                size="small"
-                icon={<ClockCircleOutlined />}
-                onClick={handleUnmarkAsStarted}
-                style={{ width: '100%' }}
-              >
-                {t('milestone.unmarkAsStarted')}
-              </Button>
+              milestone.isDefault === false ? (
+                <Tooltip title="Майлстоун является пользовательским. Отметки о начале и окончании выставляются вручную">
+                  <Button
+                    size="small"
+                    icon={<ClockCircleOutlined />}
+                    onClick={handleUnmarkAsStarted}
+                    style={{ width: '100%' }}
+                  >
+                    {t('milestone.unmarkAsStarted')} <WarningOutlined style={{ marginLeft: '8px', fontSize: '14px', color: '#faad14' }} />
+                  </Button>
+                </Tooltip>
+              ) : (
+                <Button
+                  size="small"
+                  icon={<ClockCircleOutlined />}
+                  onClick={handleUnmarkAsStarted}
+                  style={{ width: '100%' }}
+                >
+                  {t('milestone.unmarkAsStarted')}
+                </Button>
+              )
             ) : null}
             {!displayIsCompleted && (
-              <Button
-                type="primary"
-                size="small"
-                icon={<CheckCircleOutlined />}
-                onClick={() => {
-                  const stageId = stages.find((s) =>
-                    s.milestones.some((m) => m.id === milestone.id)
-                  )?.id
-                  if (stageId) {
-                    handleMilestoneComplete(stageId, milestone.id)
-                  }
-                }}
-                style={{ width: '100%' }}
-              >
-                {t('milestone.markCompleted')}
-              </Button>
-          )}
+              milestone.isDefault === false ? (
+                <Tooltip title="Майлстоун является пользовательским. Отметки о начале и окончании выставляются вручную">
+                  <Button
+                    type="primary"
+                    size="small"
+                    icon={<CheckCircleOutlined />}
+                    onClick={() => {
+                      const stageId = stages.find((s) =>
+                        s.milestones.some((m) => m.id === milestone.id)
+                      )?.id
+                      if (stageId) {
+                        handleMilestoneComplete(stageId, milestone.id)
+                      }
+                    }}
+                    style={{ width: '100%' }}
+                  >
+                    {t('milestone.markCompleted')} <WarningOutlined style={{ marginLeft: '8px', fontSize: '14px', color: '#faad14' }} />
+                  </Button>
+                </Tooltip>
+              ) : (
+                <Button
+                  type="primary"
+                  size="small"
+                  icon={<CheckCircleOutlined />}
+                  onClick={() => {
+                    const stageId = stages.find((s) =>
+                      s.milestones.some((m) => m.id === milestone.id)
+                    )?.id
+                    if (stageId) {
+                      handleMilestoneComplete(stageId, milestone.id)
+                    }
+                  }}
+                  style={{ width: '100%' }}
+                >
+                  {t('milestone.markCompleted')}
+                </Button>
+              )
+            )}
             {displayIsCompleted && (
-              <Button
-                size="small"
-                onClick={() => {
-                  const stageId = stages.find((s) =>
-                    s.milestones.some((m) => m.id === milestone.id)
-                  )?.id
-                  if (stageId) {
-                    handleMilestoneComplete(stageId, milestone.id)
-                  }
-                }}
-                style={{ width: '100%' }}
-              >
-                {t('milestone.markIncomplete')}
-              </Button>
-          )}
+              milestone.isDefault === false ? (
+                <Tooltip title="Майлстоун является пользовательским. Отметки о начале и окончании выставляются вручную">
+                  <Button
+                    size="small"
+                    onClick={() => {
+                      const stageId = stages.find((s) =>
+                        s.milestones.some((m) => m.id === milestone.id)
+                      )?.id
+                      if (stageId) {
+                        handleMilestoneComplete(stageId, milestone.id)
+                      }
+                    }}
+                    style={{ width: '100%' }}
+                  >
+                    {t('milestone.markIncomplete')} <WarningOutlined style={{ marginLeft: '8px', fontSize: '14px', color: '#faad14' }} />
+                  </Button>
+                </Tooltip>
+              ) : (
+                <Button
+                  size="small"
+                  onClick={() => {
+                    const stageId = stages.find((s) =>
+                      s.milestones.some((m) => m.id === milestone.id)
+                    )?.id
+                    if (stageId) {
+                      handleMilestoneComplete(stageId, milestone.id)
+                    }
+                  }}
+                  style={{ width: '100%' }}
+                >
+                  {t('milestone.markIncomplete')}
+                </Button>
+              )
+            )}
           </Space>
           <Divider style={{ margin: '8px 0' }} />
           <Space direction="vertical" size="small" style={{ width: '100%' }}>
-          <Popconfirm
-            title={t('milestone.deleteConfirm')}
-            onConfirm={() => {
-              const stageId = stages.find((s) =>
-                s.milestones.some((m) => m.id === milestone.id)
-              )?.id
-              if (stageId) {
-                handleMilestoneDelete(stageId, milestone.id)
-              }
-            }}
-            okText={t('common.yes')}
-            cancelText={t('common.no')}
-          >
-            <Button
-              danger
-              size="small"
-              icon={<DeleteOutlined />}
-              style={{ width: '100%' }}
+          {milestone.isDefault === false && (
+            <Popconfirm
+              title={t('milestone.deleteConfirm')}
+              onConfirm={() => {
+                const stageId = stages.find((s) =>
+                  s.milestones.some((m) => m.id === milestone.id)
+                )?.id
+                if (stageId) {
+                  handleMilestoneDelete(stageId, milestone.id)
+                }
+              }}
+              okText={t('common.yes')}
+              cancelText={t('common.no')}
             >
-              {t('milestone.delete')}
-            </Button>
-          </Popconfirm>
+              <Button
+                danger
+                size="small"
+                icon={<DeleteOutlined />}
+                style={{ width: '100%' }}
+              >
+                {t('milestone.delete')}
+              </Button>
+            </Popconfirm>
+          )}
             <Button
               type="primary"
               size="small"
@@ -945,6 +1039,142 @@ const Pipeline: React.FC = () => {
       resizeObserver.disconnect()
     }
   }, [stages])
+
+  // Измерение позиций майлстоунов для точного градиента
+  useEffect(() => {
+    const updateMilestonePositions = () => {
+      setTimeout(() => {
+        const positions: { [stageId: string]: { [milestoneId: string]: { left: number, right: number } } } = {}
+        
+        stages.forEach((stage) => {
+          if (!expandedStages.has(stage.id)) return
+          
+          const stageSegment = stageSegmentRefs.current[stage.id]
+          if (!stageSegment) return
+          
+          const stageRect = stageSegment.getBoundingClientRect()
+          positions[stage.id] = {}
+          
+          stage.milestones.forEach((milestone) => {
+            const wrapper = milestoneWrapperRefs.current[`${stage.id}-${milestone.id}`]
+            if (wrapper) {
+              const wrapperRect = wrapper.getBoundingClientRect()
+              // Используем центр иконки майлстоуна для более точного позиционирования
+              const iconWrapper = wrapper.querySelector('.milestone-icon-wrapper') as HTMLElement
+              if (iconWrapper) {
+                const iconRect = iconWrapper.getBoundingClientRect()
+                const iconCenter = iconRect.left + iconRect.width / 2
+                const relativeCenter = iconCenter - stageRect.left
+                positions[stage.id][milestone.id] = {
+                  left: relativeCenter,
+                  right: relativeCenter
+                }
+              } else {
+                // Fallback: используем центр wrapper
+                const wrapperCenter = wrapperRect.left + wrapperRect.width / 2
+                const relativeCenter = wrapperCenter - stageRect.left
+                positions[stage.id][milestone.id] = {
+                  left: relativeCenter,
+                  right: relativeCenter
+                }
+              }
+            }
+          })
+        })
+        
+        setMilestonePositions(positions)
+      }, 100)
+    }
+
+    updateMilestonePositions()
+    
+    const resizeObserver = new ResizeObserver(() => {
+      updateMilestonePositions()
+    })
+    
+    stages.forEach((stage) => {
+      const segment = stageSegmentRefs.current[stage.id]
+      if (segment) {
+        resizeObserver.observe(segment)
+      }
+      stage.milestones.forEach((milestone) => {
+        const wrapper = milestoneWrapperRefs.current[`${stage.id}-${milestone.id}`]
+        if (wrapper) {
+          resizeObserver.observe(wrapper)
+        }
+      })
+    })
+
+    return () => {
+      resizeObserver.disconnect()
+    }
+  }, [stages, expandedStages])
+
+  // Принудительное применение пунктирной границы для кастомных майлстоунов
+  useEffect(() => {
+    const applyCustomMilestoneStyles = () => {
+      let appliedCount = 0
+      stages.forEach((stage) => {
+        stage.milestones.forEach((milestone) => {
+          if (milestone.isDefault === false) {
+            const element = document.querySelector(`[data-milestone-id="${milestone.id}"]`) as HTMLElement
+            if (element) {
+              // Для кастомных майлстоунов граница теперь отображается через реальный элемент внутри
+              // Устанавливаем border: transparent и position: relative для правильной работы
+              element.style.setProperty('border', '2px solid transparent', 'important')
+              element.style.setProperty('position', 'relative', 'important')
+              
+              // Реальный элемент для пунктирной границы будет создан через React, поэтому здесь ничего не делаем
+              
+              appliedCount++
+            }
+          }
+        })
+      })
+    }
+    
+    // Применяем стили несколько раз с разными задержками для гарантии
+    const timeoutId1 = setTimeout(applyCustomMilestoneStyles, 0)
+    const timeoutId2 = setTimeout(applyCustomMilestoneStyles, 50)
+    const timeoutId3 = setTimeout(applyCustomMilestoneStyles, 200)
+    
+    // Используем MutationObserver для отслеживания изменений стилей
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+          const target = mutation.target as HTMLElement
+          if (target.hasAttribute('data-custom-milestone') && target.getAttribute('data-custom-milestone') === 'true') {
+            const computedStyle = window.getComputedStyle(target)
+            if (computedStyle.borderStyle !== 'dashed') {
+              applyCustomMilestoneStyles()
+            }
+          }
+        }
+      })
+    })
+    
+    // Наблюдаем за всеми кастомными майлстоунами
+    stages.forEach((stage) => {
+      stage.milestones.forEach((milestone) => {
+        if (milestone.isDefault === false) {
+          const element = document.querySelector(`[data-milestone-id="${milestone.id}"]`) as HTMLElement
+          if (element) {
+            observer.observe(element, {
+              attributes: true,
+              attributeFilter: ['style', 'class']
+            })
+          }
+        }
+      })
+    })
+    
+    return () => {
+      clearTimeout(timeoutId1)
+      clearTimeout(timeoutId2)
+      clearTimeout(timeoutId3)
+      observer.disconnect()
+    }
+  }, [stages, editingMilestone])
 
   // Проверка однострочных названий майлстоунов и обрезания текста
   useEffect(() => {
@@ -1136,12 +1366,22 @@ const Pipeline: React.FC = () => {
                   >
                     {stage.name}
                   </div>
-                  <Button
-                    type="text"
-                    icon={isExpanded ? <UpCircleOutlined style={{ fontSize: '20px' }} /> : <DownCircleOutlined style={{ fontSize: '20px' }} />}
-                    onClick={() => toggleStageExpansion(stage.id)}
-                    className="stage-expand-btn"
-                  />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Button
+                      type="text"
+                      icon={isExpanded ? <UpCircleOutlined style={{ fontSize: '20px' }} /> : <DownCircleOutlined style={{ fontSize: '20px' }} />}
+                      onClick={() => toggleStageExpansion(stage.id)}
+                      className="stage-expand-btn"
+                    />
+                    {isExpanded && (
+                      <Button
+                        type="text"
+                        icon={<PlusCircleOutlined style={{ fontSize: '20px' }} />}
+                        onClick={(e) => handleAddMilestone(stage.id, e)}
+                        className="stage-expand-btn"
+                      />
+                    )}
+                  </div>
                 </div>
               )
             })}
@@ -1174,7 +1414,6 @@ const Pipeline: React.FC = () => {
                     <div className="pipeline-stage-line-segments">
                       {(() => {
                         const isExpanded = expandedStages.has(stage.id)
-                        const completedCount = stage.milestones.filter((m) => m.isCompleted).length
                         const totalMilestones = stage.milestones.length
                         
                         // В свернутом состоянии или если нет майлстоунов - показываем одну синюю линию
@@ -1188,54 +1427,147 @@ const Pipeline: React.FC = () => {
                           )
                         }
                         
-                        // В развернутом состоянии показываем сегменты с цветами
-                        // Количество сегментов = количество майлстоунов + 1
-                        // (от начала до первого, между майлстоунами, от последнего до конца)
-                        const totalSegments = totalMilestones + 1
-                        const segments: JSX.Element[] = []
+                        // В развернутом состоянии создаем отдельные сегменты на основе реальных позиций майлстоунов
+                        const stagePositions = milestonePositions[stage.id]
+                        const stageSegment = stageSegmentRefs.current[stage.id]
                         
-                        for (let i = 0; i < totalSegments; i++) {
-                          // Сегмент зеленый в зависимости от количества завершенных майлстоунов
-                          // Сегмент 0 (от начала до первого майлстоуна) зеленый, если завершен хотя бы 1 майлстоун
-                          // Сегмент 1 (между первым и вторым) зеленый, если завершено >= 2 майлстоуна
-                          // ...
-                          // Последний сегмент (от последнего майлстоуна до конца) зеленый, если завершены все майлстоуны
-                          let isGreen = false
-                          if (i < totalMilestones) {
-                            // Для сегментов до последнего: зеленый, если завершено >= i+1 майлстоунов
-                            isGreen = completedCount >= i + 1
-                          } else {
-                            // Для последнего сегмента: зеленый только если завершены ВСЕ майлстоуны
-                            isGreen = completedCount === totalMilestones && totalMilestones > 0
-                          }
-                          segments.push(
+                        if (!stagePositions || !stageSegment || Object.keys(stagePositions).length === 0) {
+                          // Если позиции еще не измерены, показываем синюю линию
+                          return (
                             <div
-                              key={`segment-${i}`}
-                              className={`pipeline-line-segment ${isGreen ? 'green' : 'blue'}`}
+                              key="segment-loading"
+                              className="pipeline-line-segment blue"
                               style={{ flex: 1 }}
                             />
                           )
                         }
                         
-                        return segments
+                        const segments: JSX.Element[] = []
+                        const stageWidth = stageSegment.offsetWidth
+                        
+                        // Вспомогательная функция для проверки, нужно ли учитывать майлстоун при определении цвета
+                        // Негативные майлстоуны не влияют на цвет линии пайплайна
+                        const shouldConsiderMilestone = (milestone: Milestone): boolean => {
+                          return !milestone.isNegative
+                        }
+                        
+                        // Проверяем, завершены ли все майлстоуны кроме "Отклонена и закрыта"
+                        const otherMilestones = stage.milestones.filter(m => shouldConsiderMilestone(m))
+                        const allOtherMilestonesCompleted = otherMilestones.length > 0 && otherMilestones.every(m => m.isCompleted)
+                        
+                        // Создаем сегменты между майлстоунами
+                        // Используем центр иконки майлстоуна как точку отсчета
+                        for (let i = 0; i < stage.milestones.length; i++) {
+                          const milestone = stage.milestones[i]
+                          const pos = stagePositions[milestone.id]
+                          if (!pos) continue
+                          
+                          const milestoneCenter = pos.left // Теперь это центр иконки
+                          
+                          // Сегмент от начала до первого майлстоуна
+                          if (i === 0) {
+                            // Сегмент зеленый, если завершен первый майлстоун ИЛИ все остальные завершены
+                            const isGreen = shouldConsiderMilestone(milestone) 
+                              ? (milestone.isCompleted || allOtherMilestonesCompleted)
+                              : allOtherMilestonesCompleted
+                            segments.push(
+                              <div
+                                key={`segment-${i}-start`}
+                                className={`pipeline-line-segment ${isGreen ? 'green' : 'blue'}`}
+                                style={{
+                                  position: 'absolute',
+                                  left: 0,
+                                  width: `${milestoneCenter}px`,
+                                  height: '3px',
+                                  top: '50%',
+                                  transform: 'translateY(-50%)',
+                                }}
+                              />
+                            )
+                          }
+                          
+                          // Сегмент между майлстоунами
+                          if (i > 0) {
+                            const prevMilestone = stage.milestones[i - 1]
+                            const prevPos = stagePositions[prevMilestone.id]
+                            if (prevPos) {
+                              const prevMilestoneCenter = prevPos.left
+                              // Сегмент зеленый, если ОБА майлстоуна (предыдущий И текущий) завершены ИЛИ все остальные завершены
+                              // Проверяем isCompleted напрямую для обоих майлстоунов, независимо от того, негативные они или нет
+                              const prevCompleted = prevMilestone.isCompleted
+                              const currentCompleted = milestone.isCompleted
+                              const segmentIsGreen = allOtherMilestonesCompleted || (prevCompleted && currentCompleted)
+                              segments.push(
+                                <div
+                                  key={`segment-${i}`}
+                                  className={`pipeline-line-segment ${segmentIsGreen ? 'green' : 'blue'}`}
+                                  style={{
+                                    position: 'absolute',
+                                    left: `${prevMilestoneCenter}px`,
+                                    width: `${milestoneCenter - prevMilestoneCenter}px`,
+                                    height: '3px',
+                                    top: '50%',
+                                    transform: 'translateY(-50%)',
+                                  }}
+                                />
+                              )
+                            }
+                          }
+                        }
+                        
+                        // Последний сегмент (от последнего майлстоуна до конца)
+                        if (stage.milestones.length > 0) {
+                          const lastMilestone = stage.milestones[stage.milestones.length - 1]
+                          const lastPos = stagePositions[lastMilestone.id]
+                          if (lastPos) {
+                            const lastMilestoneCenter = lastPos.left
+                            // Последний сегмент зеленый, если завершен последний майлстоун ИЛИ все остальные завершены
+                            const lastSegmentIsGreen = shouldConsiderMilestone(lastMilestone)
+                              ? (lastMilestone.isCompleted || allOtherMilestonesCompleted)
+                              : allOtherMilestonesCompleted
+                            segments.push(
+                              <div
+                                key={`segment-end`}
+                                className={`pipeline-line-segment ${lastSegmentIsGreen ? 'green' : 'blue'}`}
+                                style={{
+                                  position: 'absolute',
+                                  left: `${lastMilestoneCenter}px`,
+                                  right: 0,
+                                  height: '3px',
+                                  top: '50%',
+                                  transform: 'translateY(-50%)',
+                                }}
+                              />
+                            )
+                          }
+                        }
+                        
+                        return <>{segments}</>
                       })()}
                     </div>
                     <div className="milestones-on-line" style={{ display: expandedStages.has(stage.id) ? 'flex' : 'none' }}>
                       {stage.milestones.map((milestone) => (
                         <div
                           key={milestone.id}
+                          ref={(el) => {
+                            milestoneWrapperRefs.current[`${stage.id}-${milestone.id}`] = el
+                          }}
                           className={`milestone-wrapper ${draggedMilestone?.milestoneId === milestone.id ? 'dragging' : ''} ${
                             dragOverMilestone === milestone.id ? 'drag-over' : ''
                           }`}
                           draggable
                           onDragStart={(e) => handleDragStart(e, stage.id, milestone.id)}
                           onDragOver={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
                             if (draggedMilestone && draggedMilestone.stageId === stage.id && draggedMilestone.milestoneId !== milestone.id) {
                               handleDragOver(e, milestone.id)
                             }
                           }}
                           onDragLeave={() => setDragOverMilestone(null)}
                           onDrop={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
                             if (draggedMilestone && draggedMilestone.stageId === stage.id) {
                               handleDrop(e, stage.id, milestone.id)
                               setDragOverMilestone(null)
@@ -1313,15 +1645,58 @@ const Pipeline: React.FC = () => {
                                     ? milestone.deadline && milestone.endDate && milestone.endDate.isAfter(milestone.deadline, 'day')
                                       ? 'completed-late'
                                       : 'completed-on-time'
-                                    : (editingMilestone && editingMilestone.id === milestone.id ? editingMilestone.isStarted : milestone.isStarted)
+                                    : milestone.isStarted
                                     ? 'in-progress'
                                     : 'not-started'
-                                } ${focusedMilestone === milestone.id ? 'focused' : ''}`}
-                                onClick={() => handleMilestoneFocus(milestone.id)}
+                                } ${focusedMilestone === milestone.id ? 'focused' : ''} ${milestone.isDefault === false ? 'custom-milestone' : ''}`}
+                                data-custom-milestone={milestone.isDefault === false ? 'true' : undefined}
+                                data-milestone-id={milestone.id}
+                                data-milestone-name={milestone.name}
+                                data-is-default={String(milestone.isDefault)}
+                                style={undefined}
+                                onClick={() => {
+                                  handleMilestoneFocus(milestone.id)
+                                }}
                               >
+                                {/* Пунктирная граница для кастомных майлстоунов */}
+                                {milestone.isDefault === false && (() => {
+                                  const status = milestone.isCompleted
+                                    ? milestone.deadline && milestone.endDate && milestone.endDate.isAfter(milestone.deadline, 'day')
+                                      ? 'completed-late'
+                                      : 'completed-on-time'
+                                    : milestone.isStarted
+                                    ? 'in-progress'
+                                    : 'not-started'
+                                  const borderColors: Record<string, string> = {
+                                    'not-started': '#d9d9d9',
+                                    'in-progress': '#faad14',
+                                    'completed-on-time': '#52c41a',
+                                    'completed-late': '#ff4d4f'
+                                  }
+                                  const borderColor = borderColors[status] || '#d9d9d9'
+                                  
+                                  return (
+                                    <div
+                                      className="custom-milestone-dashed-border"
+                                      style={{
+                                        position: 'absolute',
+                                        top: '-3px',
+                                        left: '-3px',
+                                        right: '-3px',
+                                        bottom: '-3px',
+                                        border: `3px dashed ${borderColor}`,
+                                        borderRadius: '50%',
+                                        pointerEvents: 'none',
+                                        zIndex: 11,
+                                        boxSizing: 'border-box',
+                                        backgroundColor: 'transparent'
+                                      }}
+                                    />
+                                  )
+                                })()}
                                 {milestone.isCompleted ? (
                                   <CheckCircleOutlined className="milestone-icon" />
-                                ) : (editingMilestone && editingMilestone.id === milestone.id ? editingMilestone.isStarted : milestone.isStarted) ? (
+                                ) : milestone.isStarted ? (
                                   <ClockCircleOutlined className="milestone-icon" />
                                 ) : null}
                                 {(() => {
@@ -1489,16 +1864,7 @@ const Pipeline: React.FC = () => {
                       : undefined
                   }
                 >
-                  {isExpanded && (
-                <Button
-                  type="dashed"
-                      icon={<PlusCircleOutlined />}
-                      onClick={(e) => handleAddMilestone(stage.id, e)}
-                  size="small"
-                  className="add-milestone-btn"
-                      shape="circle"
-                    />
-                  )}
+
               </div>
               )
             })}
@@ -1510,4 +1876,3 @@ const Pipeline: React.FC = () => {
 }
 
 export default Pipeline
-

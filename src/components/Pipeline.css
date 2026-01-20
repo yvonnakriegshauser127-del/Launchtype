@@ -2,7 +2,7 @@
   width: 100%;
   overflow-x: auto;
   overflow-y: visible;
-  padding: 24px 0;
+  padding: 12px 0 24px 0;
   box-sizing: border-box;
 }
 
@@ -19,7 +19,7 @@
 .pipeline-stages-header {
   display: flex;
   padding: 0 20px;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   width: 100%;
   box-sizing: border-box;
 }
@@ -110,7 +110,7 @@
 .pipeline-line {
   display: flex;
   position: relative;
-  min-height: 80px;
+  min-height: 60px;
   align-items: center;
   padding: 0;
   overflow: visible;
@@ -141,18 +141,19 @@
   left: 0;
   right: 0;
   height: 3px;
-  display: flex;
-  align-items: center;
   z-index: 0;
   transform: translateY(-50%);
   pointer-events: none;
-  gap: 0;
 }
 
 .pipeline-line-segment {
   height: 3px;
   flex: 1;
   min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  outline: none;
 }
 
 .pipeline-line-segment.blue {
@@ -195,7 +196,7 @@
   cursor: move;
   min-width: 120px;
   flex-shrink: 0;
-  height: 80px;
+  height: 60px;
 }
 
 .milestone-wrapper.dragging {
@@ -214,7 +215,6 @@
   align-items: center;
   justify-content: center;
   background: #fff;
-  border: 2px solid #d9d9d9;
   border-radius: 50%;
   cursor: pointer;
   transition: all 0.3s;
@@ -228,24 +228,49 @@
   transform: translate(-50%, -50%);
 }
 
-.milestone-icon-wrapper.not-started {
+/* Базовое правило для границы применяется только к дефолтным майлстоунам */
+.milestone-icon-wrapper:not(.custom-milestone) {
+  border: 2px solid #d9d9d9;
+}
+
+
+
+/* Фон и граница для дефолтных майлстоунов */
+.milestone-icon-wrapper.not-started:not(.custom-milestone) {
   background: #fff;
   border: 2px solid #d9d9d9;
 }
 
-.milestone-icon-wrapper.in-progress {
+.milestone-icon-wrapper.in-progress:not(.custom-milestone) {
   background: #faad14;
   border: 2px solid #faad14;
 }
 
-.milestone-icon-wrapper.completed-on-time {
+.milestone-icon-wrapper.completed-on-time:not(.custom-milestone) {
   background: #52c41a;
   border: 2px solid #52c41a;
 }
 
-.milestone-icon-wrapper.completed-late {
+.milestone-icon-wrapper.completed-late:not(.custom-milestone) {
   background: #ff4d4f;
   border: 2px solid #ff4d4f;
+}
+
+/* Фон для кастомных майлстоунов (такой же, как у дефолтных) */
+.milestone-icon-wrapper.custom-milestone.not-started {
+  background: #fff !important;
+}
+
+.milestone-icon-wrapper.custom-milestone.in-progress {
+  background: #faad14 !important;
+}
+
+.milestone-icon-wrapper.custom-milestone.completed-on-time {
+  background: #52c41a !important;
+}
+
+.milestone-icon-wrapper.custom-milestone.completed-late {
+  background: #ff4d4f !important;
 }
 
 .milestone-icon-wrapper:hover {
@@ -261,6 +286,8 @@
   font-size: 20px;
   color: #fff;
   line-height: 1;
+  position: relative;
+  z-index: 1;
 }
 
 .milestone-icon-wrapper.not-started .milestone-icon {
@@ -299,7 +326,7 @@
 
 .milestone-speed-indicator-wrapper {
   position: absolute;
-  top: -40px;
+  top: -35px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -415,4 +442,55 @@
   margin-top: 20px;
   width: 100%;
   box-sizing: border-box;
+}
+
+/* Правила для границы кастомных майлстоунов - должны идти в самом конце для максимального приоритета */
+/* Для кастомных майлстоунов граница отображается через реальный элемент внутри (custom-milestone-dashed-border) */
+.milestone-icon-wrapper[data-custom-milestone="true"].custom-milestone.not-started,
+.milestone-icon-wrapper.custom-milestone[data-custom-milestone="true"].not-started,
+.milestone-icon-wrapper[data-custom-milestone="true"].not-started {
+  border: 2px solid transparent !important;
+  position: relative;
+}
+
+.milestone-icon-wrapper[data-custom-milestone="true"].custom-milestone.in-progress,
+.milestone-icon-wrapper.custom-milestone[data-custom-milestone="true"].in-progress,
+.milestone-icon-wrapper[data-custom-milestone="true"].in-progress {
+  border: 2px solid transparent !important;
+  position: relative;
+}
+
+.milestone-icon-wrapper[data-custom-milestone="true"].custom-milestone.completed-on-time,
+.milestone-icon-wrapper.custom-milestone[data-custom-milestone="true"].completed-on-time,
+.milestone-icon-wrapper[data-custom-milestone="true"].completed-on-time {
+  border: 2px solid transparent !important;
+  position: relative;
+}
+
+.milestone-icon-wrapper[data-custom-milestone="true"].custom-milestone.completed-late,
+.milestone-icon-wrapper.custom-milestone[data-custom-milestone="true"].completed-late,
+.milestone-icon-wrapper[data-custom-milestone="true"].completed-late {
+  border: 2px solid transparent !important;
+  position: relative;
+}
+
+/* Дополнительные правила для случаев, когда используется только класс custom-milestone */
+.milestone-icon-wrapper.custom-milestone.not-started {
+  border: 2px solid transparent !important;
+  position: relative;
+}
+
+.milestone-icon-wrapper.custom-milestone.in-progress {
+  border: 2px solid transparent !important;
+  position: relative;
+}
+
+.milestone-icon-wrapper.custom-milestone.completed-on-time {
+  border: 2px solid transparent !important;
+  position: relative;
+}
+
+.milestone-icon-wrapper.custom-milestone.completed-late {
+  border: 2px solid transparent !important;
+  position: relative;
 }
