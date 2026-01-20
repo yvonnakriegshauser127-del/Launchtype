@@ -1443,7 +1443,6 @@ const Pipeline: React.FC = () => {
                         }
                         
                         const segments: JSX.Element[] = []
-                        const stageWidth = stageSegment.offsetWidth
                         
                         // Вспомогательная функция для проверки, нужно ли учитывать майлстоун при определении цвета
                         // Негативные майлстоуны не влияют на цвет линии пайплайна
