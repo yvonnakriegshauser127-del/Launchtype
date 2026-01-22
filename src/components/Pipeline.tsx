@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { Card, Button, Input, Popover, DatePicker, Space, Typography, Tooltip, Divider, Popconfirm, AutoComplete } from 'antd'
-import { PlusCircleOutlined, CheckCircleOutlined, ClockCircleOutlined, DeleteOutlined, WarningOutlined, UpCircleOutlined, DownCircleOutlined, UserOutlined, LaptopOutlined } from '@ant-design/icons'
+import { Card, Button, Input, Popover, DatePicker, Space, Typography, Tooltip, Divider, Popconfirm, AutoComplete, Tag } from 'antd'
+import { PlusCircleOutlined, CheckCircleOutlined, ClockCircleOutlined, DeleteOutlined, WarningOutlined, UpCircleOutlined, DownCircleOutlined, UserOutlined, LaptopOutlined, CloseCircleOutlined } from '@ant-design/icons'
 import dayjs, { Dayjs } from 'dayjs'
 import { useTranslation } from '../hooks/useTranslation'
 import type { Stage, Milestone } from '../types/pipeline'
@@ -23,6 +23,7 @@ const Pipeline: React.FC = () => {
     'Подготовка к запуску',
     'Тестирование функционала',
     'Финальная проверка',
+    'Перепоиск поставщика',
   ]
   
   const [stages, setStages] = useState<Stage[]>(() => {
@@ -66,7 +67,6 @@ const Pipeline: React.FC = () => {
           createMilestone('suppliers-3', 'У баера в работе'),
           createMilestone('suppliers-4', 'Поставщик найден'),
           createMilestone('suppliers-5', 'Поставщик не найден', true),
-          createMilestone('suppliers-6', 'Перепоиск поставщика'),
           createMilestone('suppliers-7', 'Поиск завершен', false, true),
         ]
       },
@@ -125,13 +125,6 @@ const Pipeline: React.FC = () => {
         milestones: [
           createMilestone('report-1', 'Успешный запуск', false, true),
           createMilestone('report-2', 'Снятие с продажи', true),
-        ]
-      },
-      { 
-        id: '8', 
-        name: 'Отклоненные и закрытые',
-        milestones: [
-          createMilestone('rejected-1', 'Отклоненные и закрытые'),
         ]
       },
     ]
@@ -909,22 +902,22 @@ const Pipeline: React.FC = () => {
                   </Button>
                 </Tooltip>
               ) : (
-                <Button
-                  type="primary"
-                  size="small"
-                  icon={<CheckCircleOutlined />}
-                  onClick={() => {
-                    const stageId = stages.find((s) =>
-                      s.milestones.some((m) => m.id === milestone.id)
-                    )?.id
-                    if (stageId) {
-                      handleMilestoneComplete(stageId, milestone.id)
-                    }
-                  }}
-                  style={{ width: '100%' }}
-                >
-                  {t('milestone.markCompleted')}
-                </Button>
+              <Button
+                type="primary"
+                size="small"
+                icon={<CheckCircleOutlined />}
+                onClick={() => {
+                  const stageId = stages.find((s) =>
+                    s.milestones.some((m) => m.id === milestone.id)
+                  )?.id
+                  if (stageId) {
+                    handleMilestoneComplete(stageId, milestone.id)
+                  }
+                }}
+                style={{ width: '100%' }}
+              >
+                {t('milestone.markCompleted')}
+              </Button>
               )
             )}
             {displayIsCompleted && (
@@ -946,48 +939,48 @@ const Pipeline: React.FC = () => {
                   </Button>
                 </Tooltip>
               ) : (
-                <Button
-                  size="small"
-                  onClick={() => {
-                    const stageId = stages.find((s) =>
-                      s.milestones.some((m) => m.id === milestone.id)
-                    )?.id
-                    if (stageId) {
-                      handleMilestoneComplete(stageId, milestone.id)
-                    }
-                  }}
-                  style={{ width: '100%' }}
-                >
-                  {t('milestone.markIncomplete')}
-                </Button>
+              <Button
+                size="small"
+                onClick={() => {
+                  const stageId = stages.find((s) =>
+                    s.milestones.some((m) => m.id === milestone.id)
+                  )?.id
+                  if (stageId) {
+                    handleMilestoneComplete(stageId, milestone.id)
+                  }
+                }}
+                style={{ width: '100%' }}
+              >
+                {t('milestone.markIncomplete')}
+              </Button>
               )
-            )}
+          )}
           </Space>
           <Divider style={{ margin: '8px 0' }} />
           <Space direction="vertical" size="small" style={{ width: '100%' }}>
           {milestone.isDefault === false && (
-            <Popconfirm
-              title={t('milestone.deleteConfirm')}
-              onConfirm={() => {
-                const stageId = stages.find((s) =>
-                  s.milestones.some((m) => m.id === milestone.id)
-                )?.id
-                if (stageId) {
-                  handleMilestoneDelete(stageId, milestone.id)
-                }
-              }}
-              okText={t('common.yes')}
-              cancelText={t('common.no')}
+          <Popconfirm
+            title={t('milestone.deleteConfirm')}
+            onConfirm={() => {
+              const stageId = stages.find((s) =>
+                s.milestones.some((m) => m.id === milestone.id)
+              )?.id
+              if (stageId) {
+                handleMilestoneDelete(stageId, milestone.id)
+              }
+            }}
+            okText={t('common.yes')}
+            cancelText={t('common.no')}
+          >
+            <Button
+              danger
+              size="small"
+              icon={<DeleteOutlined />}
+              style={{ width: '100%' }}
             >
-              <Button
-                danger
-                size="small"
-                icon={<DeleteOutlined />}
-                style={{ width: '100%' }}
-              >
-                {t('milestone.delete')}
-              </Button>
-            </Popconfirm>
+              {t('milestone.delete')}
+            </Button>
+          </Popconfirm>
           )}
             <Button
               type="primary"
@@ -1355,18 +1348,27 @@ const Pipeline: React.FC = () => {
                       : undefined
                   }
                 >
-              <div className={`stage-number ${completion === -1 ? 'empty' : ''} ${getStageSpecialColor(stage)}`}>
-                    {completion === -1 ? '' : `${completion}%`}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center', width: '100%' }}>
+                    {completion !== -1 && (
+                      <Tag
+                        color={
+                          getStageSpecialColor(stage) === 'red' ? 'red' :
+                          getStageSpecialColor(stage) === 'green' ? 'green' :
+                          'blue'
+                        }
+                        style={{ margin: 0 }}
+                      >
+                        {completion}%
+                      </Tag>
+                    )}
+                    <div 
+                      className="stage-name" 
+                      ref={(el) => {
+                        stageNameRefs.current[stage.id] = el
+                      }}
+                    >
+                      {stage.name}
               </div>
-                  <div 
-                    className="stage-name" 
-                    ref={(el) => {
-                      stageNameRefs.current[stage.id] = el
-                    }}
-                  >
-                    {stage.name}
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <Button
                       type="text"
                       icon={isExpanded ? <UpCircleOutlined style={{ fontSize: '20px' }} /> : <DownCircleOutlined style={{ fontSize: '20px' }} />}
@@ -1641,9 +1643,11 @@ const Pipeline: React.FC = () => {
                               <div
                                 className={`milestone-icon-wrapper ${
                                   milestone.isCompleted
-                                    ? milestone.deadline && milestone.endDate && milestone.endDate.isAfter(milestone.deadline, 'day')
+                                    ? milestone.isNegative
                                       ? 'completed-late'
-                                      : 'completed-on-time'
+                                      : milestone.deadline && milestone.endDate && milestone.endDate.isAfter(milestone.deadline, 'day')
+                                        ? 'completed-late'
+                                        : 'completed-on-time'
                                     : milestone.isStarted
                                     ? 'in-progress'
                                     : 'not-started'
@@ -1694,7 +1698,11 @@ const Pipeline: React.FC = () => {
                                   )
                                 })()}
                                 {milestone.isCompleted ? (
-                                  <CheckCircleOutlined className="milestone-icon" />
+                                  milestone.isNegative ? (
+                                    <CloseCircleOutlined className="milestone-icon" />
+                                ) : (
+                                    <CheckCircleOutlined className="milestone-icon" />
+                                  )
                                 ) : milestone.isStarted ? (
                                   <ClockCircleOutlined className="milestone-icon" />
                                 ) : null}
