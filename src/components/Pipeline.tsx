@@ -835,127 +835,71 @@ const Pipeline: React.FC = () => {
             </div>
           )}
               <Divider style={{ margin: '8px 0' }} />
+          {milestone.isDefault === false && (
           <Space direction="vertical" size="small" style={{ width: '100%' }}>
             {!displayIsStarted && !displayIsCompleted ? (
-              milestone.isDefault === false ? (
-                <Tooltip title="Майлстоун является пользовательским. Отметки о начале и окончании выставляются вручную">
-                  <Button
-                    size="small"
-                    icon={<ClockCircleOutlined />}
-                    onClick={handleMarkAsStarted}
-                    style={{ width: '100%' }}
-                  >
-                    {t('milestone.markAsStarted')} <WarningOutlined style={{ marginLeft: '8px', fontSize: '14px', color: '#faad14' }} />
-                  </Button>
-                </Tooltip>
-              ) : (
+              <Tooltip title="Майлстоун является пользовательским. Отметки о начале и окончании выставляются вручную">
                 <Button
                   size="small"
                   icon={<ClockCircleOutlined />}
                   onClick={handleMarkAsStarted}
                   style={{ width: '100%' }}
                 >
-                  {t('milestone.markAsStarted')}
+                  {t('milestone.markAsStarted')} <WarningOutlined style={{ marginLeft: '8px', fontSize: '14px', color: '#faad14' }} />
                 </Button>
-              )
+              </Tooltip>
             ) : (displayIsStarted || displayIsCompleted) ? (
-              milestone.isDefault === false ? (
-                <Tooltip title="Майлстоун является пользовательским. Отметки о начале и окончании выставляются вручную">
-                  <Button
-                    size="small"
-                    icon={<ClockCircleOutlined />}
-                    onClick={handleUnmarkAsStarted}
-                    style={{ width: '100%' }}
-                  >
-                    {t('milestone.unmarkAsStarted')} <WarningOutlined style={{ marginLeft: '8px', fontSize: '14px', color: '#faad14' }} />
-                  </Button>
-                </Tooltip>
-              ) : (
+              <Tooltip title="Майлстоун является пользовательским. Отметки о начале и окончании выставляются вручную">
                 <Button
                   size="small"
                   icon={<ClockCircleOutlined />}
                   onClick={handleUnmarkAsStarted}
                   style={{ width: '100%' }}
                 >
-                  {t('milestone.unmarkAsStarted')}
+                  {t('milestone.unmarkAsStarted')} <WarningOutlined style={{ marginLeft: '8px', fontSize: '14px', color: '#faad14' }} />
                 </Button>
-              )
+              </Tooltip>
             ) : null}
             {!displayIsCompleted && (
-              milestone.isDefault === false ? (
-                <Tooltip title="Майлстоун является пользовательским. Отметки о начале и окончании выставляются вручную">
-                  <Button
-                    type="primary"
-                    size="small"
-                    icon={<CheckCircleOutlined />}
-                    onClick={() => {
-                      const stageId = stages.find((s) =>
-                        s.milestones.some((m) => m.id === milestone.id)
-                      )?.id
-                      if (stageId) {
-                        handleMilestoneComplete(stageId, milestone.id)
-                      }
-                    }}
-                    style={{ width: '100%' }}
-                  >
-                    {t('milestone.markCompleted')} <WarningOutlined style={{ marginLeft: '8px', fontSize: '14px', color: '#faad14' }} />
-                  </Button>
-                </Tooltip>
-              ) : (
-              <Button
-                type="primary"
-                size="small"
-                icon={<CheckCircleOutlined />}
-                onClick={() => {
-                  const stageId = stages.find((s) =>
-                    s.milestones.some((m) => m.id === milestone.id)
-                  )?.id
-                  if (stageId) {
-                    handleMilestoneComplete(stageId, milestone.id)
-                  }
-                }}
-                style={{ width: '100%' }}
-              >
-                {t('milestone.markCompleted')}
-              </Button>
-              )
+              <Tooltip title="Майлстоун является пользовательским. Отметки о начале и окончании выставляются вручную">
+                <Button
+                  type="primary"
+                  size="small"
+                  icon={<CheckCircleOutlined />}
+                  onClick={() => {
+                    const stageId = stages.find((s) =>
+                      s.milestones.some((m) => m.id === milestone.id)
+                    )?.id
+                    if (stageId) {
+                      handleMilestoneComplete(stageId, milestone.id)
+                    }
+                  }}
+                  style={{ width: '100%' }}
+                >
+                  {t('milestone.markCompleted')} <WarningOutlined style={{ marginLeft: '8px', fontSize: '14px', color: '#faad14' }} />
+                </Button>
+              </Tooltip>
             )}
             {displayIsCompleted && (
-              milestone.isDefault === false ? (
-                <Tooltip title="Майлстоун является пользовательским. Отметки о начале и окончании выставляются вручную">
-                  <Button
-                    size="small"
-                    onClick={() => {
-                      const stageId = stages.find((s) =>
-                        s.milestones.some((m) => m.id === milestone.id)
-                      )?.id
-                      if (stageId) {
-                        handleMilestoneComplete(stageId, milestone.id)
-                      }
-                    }}
-                    style={{ width: '100%' }}
-                  >
-                    {t('milestone.markIncomplete')} <WarningOutlined style={{ marginLeft: '8px', fontSize: '14px', color: '#faad14' }} />
-                  </Button>
-                </Tooltip>
-              ) : (
-              <Button
-                size="small"
-                onClick={() => {
-                  const stageId = stages.find((s) =>
-                    s.milestones.some((m) => m.id === milestone.id)
-                  )?.id
-                  if (stageId) {
-                    handleMilestoneComplete(stageId, milestone.id)
-                  }
-                }}
-                style={{ width: '100%' }}
-              >
-                {t('milestone.markIncomplete')}
-              </Button>
-              )
+              <Tooltip title="Майлстоун является пользовательским. Отметки о начале и окончании выставляются вручную">
+                <Button
+                  size="small"
+                  onClick={() => {
+                    const stageId = stages.find((s) =>
+                      s.milestones.some((m) => m.id === milestone.id)
+                    )?.id
+                    if (stageId) {
+                      handleMilestoneComplete(stageId, milestone.id)
+                    }
+                  }}
+                  style={{ width: '100%' }}
+                >
+                  {t('milestone.markIncomplete')} <WarningOutlined style={{ marginLeft: '8px', fontSize: '14px', color: '#faad14' }} />
+                </Button>
+              </Tooltip>
           )}
           </Space>
+          )}
           <Divider style={{ margin: '8px 0' }} />
           <Space direction="vertical" size="small" style={{ width: '100%' }}>
           {milestone.isDefault === false && (
