@@ -1566,16 +1566,12 @@ const Pipeline: React.FC = () => {
                                   <div>
                                     {t('milestone.startDate')}: {milestone.startDate ? milestone.startDate.format('DD.MM.YYYY') : '-'}
                                   </div>
-                                  {milestone.isCompleted && milestone.endDate && (
-                                    <div>
-                                      {t('milestone.endDate')}: {milestone.endDate.format('DD.MM.YYYY')}
-                                    </div>
-                                  )}
-                                  {milestone.deadline && (
-                                    <div style={{ color: milestone.deadline && dayjs().isAfter(milestone.deadline, 'day') ? '#ff4d4f' : 'inherit' }}>
-                                      {t('milestone.deadline')}: {milestone.deadline.format('DD.MM.YYYY')}
-                                    </div>
-                                  )}
+                                  <div>
+                                    {t('milestone.endDate')}: {milestone.endDate ? milestone.endDate.format('DD.MM.YYYY') : '-'}
+                                  </div>
+                                  <div style={{ color: milestone.deadline && dayjs().isAfter(milestone.deadline, 'day') ? '#ff4d4f' : 'inherit' }}>
+                                    {t('milestone.deadline')}: {milestone.deadline ? milestone.deadline.format('DD.MM.YYYY') : '-'}
+                                  </div>
                                   {milestone.comment && (
                                     <div style={{ color: '#ff4d4f' }}>
                                       {t('milestone.comment')}: {milestone.comment}
